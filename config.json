@@ -1,0 +1,14 @@
+{
+    "neo4j_addr": "D:\\softwares\\neo4j\\import\\",
+    "entity": [
+        "country",
+        "state",
+        "city",
+        "region",
+        "locale",
+        "site"
+    ],
+    "relation": [
+        "belong"
+    ]
+}
