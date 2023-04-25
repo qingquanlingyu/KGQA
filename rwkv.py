@@ -1,18 +1,19 @@
 import requests
 import json
 
+url = 'http://10.80.43.125:7888/'
+
 
 def rwkv(words: str):
-    url = 'http://127.0.0.1:7888/chat'
     data = {
         "log": words,
-        "top_p":  0.2,
-        "temperature": 0.8,
-        "presence_penalty": 0.2,
-        "frequency_penalty": 0.2
+        "top_p":  0.5,
+        "temperature": 1.1,
+        "presence_penalty": 0.3,
+        "frequency_penalty": 0.3
     }
 
-    response = requests.post(url, json.dumps(data))
+    response = requests.post(url+"chat", json.dumps(data))
     if response.status_code == 200:
         return response.text
     else:
@@ -20,6 +21,5 @@ def rwkv(words: str):
 
 
 def rwkvreset():
-    url = 'http://127.0.0.1:7888/reset'
-    response = requests.get(url)
+    response = requests.get(url+"reset")
     return response.text

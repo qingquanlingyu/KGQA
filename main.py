@@ -22,9 +22,8 @@ important = ["商店", "景点", "博物馆", "餐厅"]
 
 def build_actree(wordlist):
     ac = Ahocorasick()
-    for word in wordlist:
-        print(word)
-        ac.addWord(word)
+    for key in wordlist:
+        ac.addWord(key)
     ac.make()
     return ac
 
@@ -34,6 +33,19 @@ ac = build_actree(entity)
 
 def replace_entity(question, re):
     recog_entities = ac.find(question)
+    recog_entities.sort(key=len, reverse=True)
+
+    # 删除相互包含的实体，保留其中更长的
+    i = 0
+    while i < len(recog_entities):
+        j = i + 1
+        while j < len(recog_entities):
+            if recog_entities[j] in recog_entities[i]:
+                recog_entities.pop(j)  # 删除包含的实体
+            else:
+                j += 1   # 检查下一个实体
+        i += 1  # 检查下一个实体
+
     re += recog_entities
     for e in recog_entities:
         question = question.replace(e, entity[e], 1)
@@ -319,7 +331,7 @@ async def llm(question: str):
                 res = "、".join(res)
                 knowledge += f"可以通过{res}到达{onee}。\n"
     rep = rwkv(
-        f"学习以下文段,用中文回答问题。如果无法从中得到答案，忽略文段内容并用中文回答问题。\n{knowledge}问题：{pre_question}")
+        f"请扮演一名分析师，根据以下内容回答: {pre_question}\n{knowledge}")
 
     return rep
 
