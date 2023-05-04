@@ -6,3 +6,5 @@ py2neo疑似寄了，封装了一套自己常用的Neo4j操作
 意图识别调用torchtext自带的xmlroberta进行训练，训练集为自编的智慧城市下的若干公共服务场景的用户问题，对实体和语气词进行预处理，使用EDA_NLP_for_Chinese进行数据增强
 
 LLM使用RWKV，借鉴了wenda的prompt，对用户问题中找到的所有实体，查询其在知识图谱中的所有相关知识送入LLM prompt中
+
+RWKV用的API见我的另一仓库，对知识图谱的调用的wenda接口同样上传
