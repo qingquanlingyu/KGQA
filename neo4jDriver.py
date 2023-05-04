@@ -1,5 +1,4 @@
 from neo4j import GraphDatabase
-from neo4j.exceptions import ServiceUnavailable
 
 __all__ = ['Neo4j']
 
@@ -14,6 +13,11 @@ class Neo4j:
     def run(self, cmd):
         with self.driver.session() as session:
             res = session.run(cmd)
+            return res
+
+    def run_retValue(self, cmd):
+        with self.driver.session() as session:
+            res = session.run(cmd).value()
             return res
 
     def findLabel_retAttr(self, label, attr):
@@ -82,7 +86,8 @@ class Neo4j:
         search = f'MATCH (a:{label}) RETURN a.{attr}'
         result = tx.run(search)
         for record in result:
-            res.append(record["a."+attr])
+            if record["a."+attr] is not None:
+                res.append(record["a."+attr])
         return res
 
     @staticmethod
@@ -92,7 +97,8 @@ class Neo4j:
         search = f'MATCH (a) WHERE a.name="{name}" RETURN a.{attr}'
         result = tx.run(search)
         for record in result:
-            res.append(record["a."+attr])
+            if record["a."+attr] is not None:
+                res.append(record["a."+attr])
         return res
 
     @staticmethod
@@ -102,7 +108,8 @@ class Neo4j:
         search = f'MATCH (a)-[r]->(b) WHERE a.{attr1}="{val1}" AND b.{attr2}="{val2}" RETURN r.note'
         result = tx.run(search)
         for record in result:
-            res.append(record["r.note"])
+            if record["r.note"] is not None:
+                res.append(record["r.note"])
         return res
 
     @staticmethod
@@ -112,7 +119,8 @@ class Neo4j:
         search = f'MATCH (a)-[r:{rel}]->(b) WHERE a.name="{fname}" RETURN b.name'
         result = tx.run(search)
         for record in result:
-            res.append(record["b.name"])
+            if record["b.name"] is not None:
+                res.append(record["b.name"])
         return res
 
     @staticmethod
@@ -122,7 +130,8 @@ class Neo4j:
         search = f'MATCH (a)-[r:{rel}]->(b) WHERE b.name="{fname}" RETURN a.name'
         result = tx.run(search)
         for record in result:
-            res.append(record["a.name"])
+            if record["a.name"] is not None:
+                res.append(record["a.name"])
         return res
 
     @staticmethod
@@ -132,7 +141,8 @@ class Neo4j:
         search = f'MATCH (a)-[r:{rel}]->(b) WHERE a.name="{aname}" AND b.{battr}="{bval}" RETURN b.name'
         result = tx.run(search)
         for record in result:
-            res.append(record["b.name"])
+            if record["b.name"] is not None:
+                res.append(record["b.name"])
         return res
 
     @staticmethod
@@ -142,7 +152,8 @@ class Neo4j:
         search = f'MATCH (a)-[r:{rel}]->(b) WHERE b.name="{bname}" AND a.{aattr}="{aval}" RETURN a.name'
         result = tx.run(search)
         for record in result:
-            res.append(record["a.name"])
+            if record["a.name"] is not None:
+                res.append(record["a.name"])
         return res
 
     @staticmethod
@@ -152,5 +163,6 @@ class Neo4j:
         search = f'MATCH (n) WHERE n.name="{name}" RETURN properties(n) AS properties'
         result = tx.run(search)
         for record in result:
-            res.append(record["properties"])
+            if record["properties"] is not None:
+                res.append(record["properties"])
         return res

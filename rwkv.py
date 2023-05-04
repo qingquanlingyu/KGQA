@@ -12,11 +12,10 @@ def rwkv(words: str):
         "presence_penalty": 0.3,
         "frequency_penalty": 0.3
     }
-
-    response = requests.post(url+"chat", json.dumps(data))
-    if response.status_code == 200:
+    try:
+        response = requests.post(url+"chat", json.dumps(data))
         return response.text
-    else:
+    except requests.exceptions.RequestException as e:
         return "抱歉，我无法理解你的问题"
 
 

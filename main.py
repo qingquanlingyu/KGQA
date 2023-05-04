@@ -169,7 +169,7 @@ async def base(question: str):
                 if (len(res) == 0):
                     return f"抱歉，未找到{ques_entities[0]}的介绍信息"
                 else:
-                    return f"{ques_entities[0]}"+"，".join(res)
+                    return f"{ques_entities[0]}："+"，".join(res)
             elif inte == 7:  # 问附属吃
                 if (entity[ques_entities[0]] == "locale"):
                     res = Neo.findARelB_WithAAttr_retA(
