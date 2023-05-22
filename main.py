@@ -71,7 +71,7 @@ async def base(question: str):
 
     question = replace_entity(question, ques_entities)
 
-    yuqi = ["?", "？", "吗", "啊", "呀"]
+    yuqi = ["?", "？", "吗", "啊", "呀", "吧"]
     for yuqici in yuqi:
         if (question.endswith(yuqici)):
             question = question[:len(question)-len(yuqici)]
@@ -89,6 +89,7 @@ async def base(question: str):
 
         if (reco is False):
             return rwkv(question)
+
         elif cnt == 1:
             if inte == 1 or inte == 11:  # 问双实体关系，不应该出现
                 return base_rep
@@ -231,6 +232,49 @@ async def base(question: str):
                 else:
                     return "你可以去：""，".join(res)
 
+            elif inte == 12:  # 问首都
+                if entity[ques_entities[0]] == "country":
+                    locale = Neo.findARelB_retA(ques_entities[0], "belong")
+                    hascaption = ""
+                    for onelocale in locale:
+                        if entity[onelocale] == "city":
+                            cityclass = Neo.findName_retAttr(
+                                onelocale, "class")
+                            if cityclass[0] == "首都":
+                                hascaption = onelocale
+                                break
+                    if hascaption == "":
+                        return f"抱歉，未找到{ques_entities[0]}的首都"
+                    return f"{ques_entities[0]}的首都是{hascaption}"
+                elif entity[ques_entities[0]] == "state":
+                    locale = Neo.findARelB_retA(ques_entities[0], "belong")
+                    haspcaption = ""
+                    for onelocale in locale:
+                        if entity[onelocale] == "city":
+                            cityclass = Neo.findName_retAttr(
+                                onelocale, "class")
+                            if cityclass[0] == "首府":
+                                haspcaption = onelocale
+                                break
+                    if haspcaption == "":
+                        return f"抱歉，未找到{ques_entities[0]}的首府"
+                    return f"{ques_entities[0]}的首都是{haspcaption}"
+
+            elif inte == 13:  # 问附属
+                additions = []
+                answer = ""
+                additions += Neo.findARelB_retB(ques_entities[0], "addition")
+                additions += Neo.findARelB_retA(ques_entities[0], "addition")
+                if (len(additions) == 0):
+                    return f"抱歉，未找到{ques_entities[0]}相关附属"
+                for addition in additions:
+                    reldes = Neo.find2Name_retRel(ques_entities[0], addition)
+                    reldes = "，".join(reldes)
+                    answer += f"{reldes}，"
+                if (answer.endswith('，')):
+                    answer = answer[:-len('，')]
+                return answer
+
         elif cnt == 2:
             if inte != 1 and inte != 11:  # 不是问关系和除同级，不应该出现
                 return base_rep
@@ -290,17 +334,41 @@ async def llm(question: str):
                 elif (key == "website"):
                     knowledge += f"{onee}的网址联系方式是:{attr[key]}。\n"
 
+        if entity[onee] == "site":
+            additions = []
+            additions += Neo.findARelB_retB(onee, "addition")
+            additions += Neo.findARelB_retA(onee, "addition")
+            for addition in additions:
+                reldes = Neo.find2Name_retRel(onee, addition)
+                reldes = "，".join(reldes)
+                knowledge += f"{reldes}，"
+            if (knowledge.endswith('，')):
+                knowledge = knowledge[:-len('，')]
+                knowledge += "。\n"
+
         tmp = onee  # 所有上级，仅限本知识图谱父子关系明确，复杂关系建议只提供邻居信息
+
         while True:
             tmp2 = Neo.findARelB_retB(tmp, "belong")
             if (len(tmp2) != 1):
                 break
             tmp2 = tmp2[0]
-            knowledge += f"{tmp}在地理上从属于{tmp2}，"
+            reldes = Neo.find2Name_retRel(tmp, tmp2)
+            reldes = "，".join(reldes)
+            knowledge += f"{reldes}，"
             tmp = tmp2
         if (knowledge.endswith('，')):
             knowledge = knowledge[:-len('，')]
             knowledge += "。\n"
+
+        if (entity[onee] == "city"):
+            upper = Neo.findARelB_retB(onee, "belong")
+            if (len(upper) == 1):
+                cclass = Neo.findName_retAttr(onee, "class")
+                if (cclass[0] == "首都"):
+                    knowledge += f"{upper[0]}的首都是{onee}。\n"
+                elif (cclass[0] == "首府"):
+                    knowledge += f"{upper[0]}的首府是{onee}。\n"
 
         if (entity[onee] == "site"):
             upper = Neo.findARelB_retB(onee, "belong")
@@ -330,8 +398,13 @@ async def llm(question: str):
             if (len(res) != 0):
                 res = "、".join(res)
                 knowledge += f"可以通过{res}到达{onee}。\n"
-    rep = rwkv(
-        f"请扮演一名分析师，根据以下内容回答: {pre_question}\n{knowledge}")
+
+    rep = ""
+    if (knowledge == ""):
+        rep = rwkv(pre_question)
+    else:
+        rep = rwkv(
+            f"请扮演一名分析师，根据以下内容回答: {pre_question}\n{knowledge}")
 
     return rep
 

@@ -14,7 +14,12 @@ def rwkv(words: str):
     }
     try:
         response = requests.post(url+"chat", json.dumps(data))
-        return response.text
+        res = response.text
+        res = res.strip("\"")
+        res = res.replace(r'\"', r'"')
+        res = res.replace(r'\\n', r'\n')
+        print(res)
+        return res
     except requests.exceptions.RequestException as e:
         return "抱歉，我无法理解你的问题"
 
