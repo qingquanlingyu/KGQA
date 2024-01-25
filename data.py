@@ -9,7 +9,7 @@ def loadData():
     with open('./config.json') as _config:
         URI = "neo4j://localhost:7687"
         USER = "neo4j"
-        PASSWORD = "asantuSB"
+        PASSWORD = "密码"
         Neo = Neo4j(URI, USER, PASSWORD)
         Neo.run("MATCH (n) DETACH DELETE n")
 
@@ -42,8 +42,7 @@ def loadData():
             Neo.run(cmd)
 
         print(entity)
-        # print(type(entity["纽约"]))
-        # print(type(entity["纽约市"]))
+        
         Neo.close()
         _config.close()
 
