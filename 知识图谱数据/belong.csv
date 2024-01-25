@@ -1,0 +1,16 @@
+a,b,from,to,note
+state,country,纽约州,美国,%from是%to的州
+city,state,纽约市,纽约州,%from是%to的下属城市
+city,state,奥尔巴尼,纽约州,%from是%to的首府
+city,country,华盛顿,美国,%from是%to的首都
+region,city,曼哈顿区,纽约市,%from是%to的辖区
+region,city,皇后区,纽约市,%from是%to的辖区
+region,city,布鲁克林区,纽约市,%from是%to的辖区
+region,city,布朗克斯区,纽约市,%from是%to的辖区
+region,city,斯塔滕岛,纽约市,%from是%to的辖区
+locale,region,自由岛,曼哈顿区,%from位于%to
+site,locale,自由岛轮渡码头,自由岛,%from位于%to
+site,locale,自由女神像,自由岛,%from位于%to
+site,locale,自由女神像博物馆商店,自由岛,%from位于%to
+site,locale,自由女神像博物馆,自由岛,%from位于%to
+site,locale,自由女神像皇冠咖啡厅,自由岛,%from位于%to
